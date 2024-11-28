@@ -6,17 +6,27 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger()
 
 class InvalidRateException(Exception):
-    """Custom exception for negative value for rate."""
+    """Custom exception raised when a negative interest rate is provided."""
     def __init__(self, message):
         super().__init__(message)
 
 class InvalidLoanDurationException(Exception):
-    """Custom exception for invalid loan durations."""
+    """Custom exception raised for invalid loan durations."""
     def __init__(self, message):
         super().__init__(message)
 
 def calculate_monthly_installment(principal, annual_rate, years):
-    """Calculate the monthly EMI for a loan."""
+    """
+    Calculate the monthly EMI (Equated Monthly Installment) for a loan.
+
+    Args:
+        principal (float): The loan amount (principal).
+        annual_rate (float): The annual interest rate as a percentage.
+        years (int): The loan duration in years.
+
+    Returns:
+        float: The calculated monthly installment.
+    """
     monthly_rate = annual_rate / 100 / 12
     number_of_payments = years * 12
 
@@ -28,7 +38,18 @@ def calculate_monthly_installment(principal, annual_rate, years):
     return emi
 
 def run_test_case(principal, rate, years, writer):
-    """Run a single test case and save the result."""
+    """
+    Execute a single test case for EMI calculation.
+
+    Args:
+        principal (float): The loan amount (principal).
+        rate (float): The annual interest rate as a percentage.
+        years (int): The loan duration in years.
+        writer (file object): The file object to save the result.
+
+    Writes:
+        The test case result or error messages to the provided file.
+    """
     try:
         if rate < 0:
             raise InvalidRateException("Rate of interest should be a positive value.")
@@ -49,7 +70,15 @@ def run_test_case(principal, rate, years, writer):
         writer.write(error + "\n")
 
 def run_all_test_cases(writer):
-    """Run all predefined test cases."""
+    """
+    Run a predefined set of test cases for EMI calculation.
+
+    Args:
+        writer (file object): The file object to save the results.
+
+    Writes:
+        Results of all test cases to the provided file.
+    """
     logger.info("Running Test Cases")
     writer.write("\nTest Cases:\n")
 
@@ -66,6 +95,13 @@ def run_all_test_cases(writer):
         run_test_case(principal, rate, years, writer)
 
 def main():
+    """
+    Main function to execute the Loan EMI Calculator program.
+
+    Prompts the user for input and validates it, calculates the EMI, and runs predefined test cases.
+
+    Saves results to a file and provides appropriate feedback to the user.
+    """
     file_path = "LoanTestCasesOutput.txt"
     with open(file_path, "w") as writer:
         logger.info("Loan Installment Calculator Started")
