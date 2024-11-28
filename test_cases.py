@@ -1,6 +1,5 @@
 import logging
 from utils.emi_calculator import calculate_monthly_installment
-from utils.exceptions import InvalidRateException, InvalidLoanDurationException
 
 logger = logging.getLogger()
 file_path = "loan_calculator/TestCaseOutput.txt"
@@ -9,7 +8,7 @@ def run_test_case(principal, rate, years, writer):
     """
     Runs a single test case for loan EMI calculation.
 
-    This function validates the provided input values (principal, rate, and years), calculates the EMI using the `calculate_monthly_installment` function if valid, and logs and writes the result. If any validation fails (e.g., negative rate or invalid loan duration), an exception is raised and the error message is logged and written.
+    This function validates the provided input values (principal, rate, and years), calculates the EMI using the `calculate_monthly_installment` function if valid, and logs and writes the result. If any validation fails, an AssertionError is raised, and the error message is logged and written.
 
     Parameters:
     - principal (float): The loan amount.
@@ -21,25 +20,27 @@ def run_test_case(principal, rate, years, writer):
     - None
     """
     try:
-        if rate < 0:
-            raise InvalidRateException("Rate of interest should be a positive value.")
-        if years <= 0 or years > 30:
-            raise InvalidLoanDurationException("Loan duration must be between 1 and 30 years.")
+        # Validate input using assert statements
+        assert rate >= 0, "Rate of interest should be a positive value."
+        assert 0 < years <= 30, "Loan duration must be between 1 and 30 years."
 
+        # If validation passes, calculate EMI
         emi = calculate_monthly_installment(principal, rate, years)
         result = f"Principal: {principal}, Rate: {rate}%, Years: {years} => EMI: {emi:.2f}"
         logger.info(result)
         writer.write(result + "\n")
-    except (InvalidRateException, InvalidLoanDurationException) as ex:
+
+    except AssertionError as ex:
+        # Log and write validation errors
         error = f"Error - Principal: {principal}, Rate: {rate}%, Years: {years} => {ex}"
         logger.error(error)
         writer.write(error + "\n")
 
 def run_all_test_cases(writer):
     """
-    Runs all predefined test cases for loan EMI calculation.
+    Runs all user-defined test cases for loan EMI calculation.
 
-    This function iterates over a list of predefined test cases, calls `run_test_case` for each, and logs and writes the result of each test case. It also handles cases where errors are raised due to invalid inputs (e.g., negative interest rate, invalid loan duration).
+    This function prompts the user to input test case values for loan EMI calculation. It also validates the inputs and logs the results.
 
     Parameters:
     - writer (file object): A file object where test case results or errors are written.
@@ -50,17 +51,25 @@ def run_all_test_cases(writer):
     logger.info("Running Test Cases")
     writer.write("\nTest Cases:\n")
 
-    test_cases = [
-        (100000, 5, 10),
-        (200000, 0, 20),
-        (50000, -7.5, 5),
-        (300000, 10, -15),
-        (1000000, 3, 25)
-    ]
+    # Ask user for the number of test cases
+    num_cases = int(input("Enter the number of test cases: "))
 
-    for i, (principal, rate, years) in enumerate(test_cases, start=1):
-        writer.write(f"Test Case {i}:\n")
-        run_test_case(principal, rate, years, writer)
+    for i in range(num_cases):
+        print(f"\nTest Case {i + 1}:")
+
+        # Get input for each test case
+        try:
+            principal = float(input("Enter the principal amount: "))
+            rate = float(input("Enter the annual interest rate (in percentage): "))
+            years = int(input("Enter the loan duration in years: "))
+
+            # Run the test case
+            writer.write(f"Test Case {i + 1}:\n")
+            run_test_case(principal, rate, years, writer)
+
+        except ValueError:
+            logger.error(f"Invalid input for Test Case {i + 1}. Please enter valid numerical values.")
+            writer.write(f"Invalid input for Test Case {i + 1}. Please enter valid numerical values.\n")
 
     logger.info(f"Results saved to {file_path}")
 
