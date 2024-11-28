@@ -1,7 +1,6 @@
 import logging
 from utils.emi_calculator import calculate_monthly_installment
 from utils.exceptions import InvalidRateException, InvalidLoanDurationException
-from tests.test_cases import run_all_test_cases
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -15,7 +14,6 @@ def main():
     
     The program allows up to three attempts to input valid data. 
     After each invalid input, an error message is logged and the remaining attempts are displayed. 
-    If the input is valid, the program writes the result to a file and runs all test cases.
     """
     file_path = "loan_calculator/LoanCalculatorOutput.txt"
     with open(file_path, "w") as writer:
@@ -50,9 +48,6 @@ def main():
                 else:
                     logger.error("All attempts used. Exiting the program.")
                     writer.write("All attempts used. Program exited.\n")
-
-        if is_valid_input:
-            run_all_test_cases(writer)
 
     logger.info(f"Results saved to {file_path}")
 
